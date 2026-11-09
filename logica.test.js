@@ -4,6 +4,7 @@ const {
   leerDistancia, leerTiempo, predecirSegundos, calcularPredicciones,
   formatearTiempo, formatearRitmo, calcularZonas,
   leerSesion, cargaSesion, ordenarSesiones, borrarSesion, leerSesionesGuardadas, formatearFecha,
+  lunesDeLaSemana, subeDemasiado, cargasSemanales, formatearCambio,
 } = require('./logica.js');
 
 test('leerDistancia acepta enteros y decimales con coma o punto', () => {
@@ -124,4 +125,58 @@ test('leerSesionesGuardadas devuelve [] si no hay nada o está corrupto', () => 
 
 test('formatearFecha pasa de aaaa-mm-dd a dd/mm/aaaa', () => {
   assert.equal(formatearFecha('2026-11-09'), '09/11/2026');
+});
+
+test('lunesDeLaSemana: semanas de lunes a domingo', () => {
+  assert.equal(lunesDeLaSemana('2026-11-09'), '2026-11-09'); // lunes
+  assert.equal(lunesDeLaSemana('2026-11-15'), '2026-11-09'); // domingo
+  assert.equal(lunesDeLaSemana('2026-11-08'), '2026-11-02'); // domingo anterior
+  assert.equal(lunesDeLaSemana('2026-01-01'), '2025-12-29'); // cambio de año
+});
+
+test('subeDemasiado: solo si sube MÁS de un 15 % y la semana anterior tenía carga', () => {
+  assert.equal(subeDemasiado(1000, 1160), true);
+  assert.equal(subeDemasiado(1000, 1150), false);
+  assert.equal(subeDemasiado(1000, 1151), true);
+  assert.equal(subeDemasiado(0, 500), false);
+  assert.equal(subeDemasiado(1000, 800), false);
+});
+
+test('cargasSemanales suma por semana, compara con la anterior y avisa', () => {
+  const sesiones = [
+    { fecha: '2026-11-02', minutos: 100, rpe: 10 }, // semana del 2/11: 1000
+    { fecha: '2026-11-09', minutos: 100, rpe: 10 }, // semana del 9/11: 1160
+    { fecha: '2026-11-15', minutos: 16, rpe: 10 },
+  ];
+  assert.deepEqual(cargasSemanales(sesiones), [
+    { lunes: '2026-11-09', carga: 1160, anterior: 1000, aviso: true },
+    { lunes: '2026-11-02', carga: 1000, anterior: 0, aviso: false },
+  ]);
+});
+
+test('cargasSemanales: domingo 8/11 y lunes 9/11 caen en semanas distintas', () => {
+  const semanas = cargasSemanales([
+    { fecha: '2026-11-08', minutos: 10, rpe: 1 },
+    { fecha: '2026-11-09', minutos: 20, rpe: 1 },
+  ]);
+  assert.deepEqual(semanas.map((x) => [x.lunes, x.carga]), [['2026-11-09', 20], ['2026-11-02', 10]]);
+});
+
+test('cargasSemanales: si hay una semana vacía en medio, la anterior cuenta como 0', () => {
+  const semanas = cargasSemanales([
+    { fecha: '2026-11-02', minutos: 10, rpe: 1 },
+    { fecha: '2026-11-16', minutos: 100, rpe: 1 },
+  ]);
+  assert.deepEqual(semanas[0], { lunes: '2026-11-16', carga: 100, anterior: 0, aviso: false });
+});
+
+test('cargasSemanales sin sesiones devuelve []', () => {
+  assert.deepEqual(cargasSemanales([]), []);
+});
+
+test('formatearCambio da el porcentaje con signo, o — sin semana anterior', () => {
+  assert.equal(formatearCambio(1000, 1160), '+16 %');
+  assert.equal(formatearCambio(1000, 800), '-20 %');
+  assert.equal(formatearCambio(1000, 1000), '0 %');
+  assert.equal(formatearCambio(0, 500), '—');
 });

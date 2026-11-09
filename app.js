@@ -57,6 +57,7 @@ const formSesion = document.getElementById('form-sesion');
 const errorSesion = document.getElementById('error-sesion');
 const sinSesiones = document.getElementById('sin-sesiones');
 const tablaSesiones = document.getElementById('tabla-sesiones');
+const tablaSemanas = document.getElementById('tabla-semanas');
 
 function cargarSesiones() {
   return leerSesionesGuardadas(localStorage.getItem(CLAVE_SESIONES));
@@ -92,10 +93,23 @@ function filaSesion(sesion) {
   return tr;
 }
 
+function pintarSemanas(sesiones) {
+  const semanas = cargasSemanales(sesiones);
+  rellenarTabla(tablaSemanas, semanas.map((x) => [
+    formatearFecha(x.lunes), x.carga, formatearCambio(x.anterior, x.carga),
+    x.aviso ? '⚠ Sube más de un 15 %' : '',
+  ]));
+  tablaSemanas.querySelectorAll('tbody tr').forEach((tr, i) => {
+    tr.classList.toggle('aviso', semanas[i].aviso);
+  });
+}
+
 function pintarDiario() {
   const sesiones = ordenarSesiones(cargarSesiones());
   tablaSesiones.querySelector('tbody').replaceChildren(...sesiones.map(filaSesion));
+  pintarSemanas(sesiones);
   tablaSesiones.hidden = sesiones.length === 0;
+  tablaSemanas.hidden = sesiones.length === 0;
   sinSesiones.hidden = sesiones.length > 0;
 }
 

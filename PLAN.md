@@ -69,8 +69,8 @@ Al cerrar cada fase: la app se abre con doble clic en `index.html`, `node --test
 **Objetivo:** ver la carga de cada semana y detectar subidas bruscas.
 
 **Tareas:**
-- [ ] En `logica.js`: agrupar las sesiones por semana (lunes a domingo), sumar la carga y compararla con la semana anterior.
-- [ ] Tabla de semanas con su carga total y un aviso visible si sube más de un 15 %.
+- [x] En `logica.js`: agrupar las sesiones por semana (lunes a domingo), sumar la carga y compararla con la semana anterior.
+- [x] Tabla de semanas con su carga total y un aviso visible si sube más de un 15 %.
 
 **Pruebas:**
 - Unitarias: 1000 → 1160 avisa; 1000 → 1150 no avisa; semana anterior a 0 no avisa; domingo 8/11/2026 y lunes 9/11/2026 caen en semanas distintas.

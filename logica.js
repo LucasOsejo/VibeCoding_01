@@ -138,10 +138,61 @@ function formatearFecha(fecha) {
   return `${d}/${m}/${a}`;
 }
 
+// ---------- Carga semanal ----------
+
+const DIA_MS = 24 * 60 * 60 * 1000;
+const SUBIDA_MAXIMA_PORCENTAJE = 15;
+
+// Se trabaja en UTC para que el huso horario no mueva las fechas de día.
+function fechaUTC(fecha) {
+  const [a, m, d] = fecha.split('-').map(Number);
+  return Date.UTC(a, m - 1, d);
+}
+
+function textoFecha(ms) {
+  return new Date(ms).toISOString().slice(0, 10);
+}
+
+// Lunes (aaaa-mm-dd) de la semana de lunes a domingo que contiene la fecha.
+function lunesDeLaSemana(fecha) {
+  const ms = fechaUTC(fecha);
+  const diasDesdeLunes = (new Date(ms).getUTCDay() + 6) % 7;
+  return textoFecha(ms - diasDesdeLunes * DIA_MS);
+}
+
+// true si la carga sube más de un 15 % y la semana anterior tenía carga.
+// Se compara con enteros para evitar errores de redondeo (1000 × 1,15).
+function subeDemasiado(anterior, actual) {
+  return anterior > 0 && actual * 100 > anterior * (100 + SUBIDA_MAXIMA_PORCENTAJE);
+}
+
+// Una entrada por semana con sesiones, de la más reciente a la más antigua.
+// "anterior" es la carga de la semana de calendario previa (0 si no hubo sesiones).
+function cargasSemanales(sesiones) {
+  const porSemana = new Map();
+  for (const s of sesiones) {
+    const lunes = lunesDeLaSemana(s.fecha);
+    porSemana.set(lunes, (porSemana.get(lunes) || 0) + cargaSesion(s));
+  }
+  return [...porSemana.keys()].sort().reverse().map((lunes) => {
+    const carga = porSemana.get(lunes);
+    const anterior = porSemana.get(textoFecha(fechaUTC(lunes) - 7 * DIA_MS)) || 0;
+    return { lunes, carga, anterior, aviso: subeDemasiado(anterior, carga) };
+  });
+}
+
+// "+16 %", "-20 %", "0 %"; "—" si no hay semana anterior con la que comparar.
+function formatearCambio(anterior, actual) {
+  if (anterior <= 0) return '—';
+  const porcentaje = Math.round(((actual - anterior) / anterior) * 100);
+  return `${porcentaje > 0 ? '+' : ''}${porcentaje} %`;
+}
+
 if (typeof module !== 'undefined') {
   module.exports = {
     leerDistancia, leerTiempo, predecirSegundos, calcularPredicciones,
     formatearTiempo, formatearRitmo, calcularZonas,
     leerSesion, cargaSesion, ordenarSesiones, borrarSesion, leerSesionesGuardadas, formatearFecha,
+    lunesDeLaSemana, subeDemasiado, cargasSemanales, formatearCambio,
   };
 }

@@ -8,6 +8,7 @@
     body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
     label { display: block; margin: 0.5rem 0; }
     .error { color: #b00020; }
+    .aviso td { background: #fdecea; }
     table { border-collapse: collapse; margin-top: 1rem; }
     th, td { padding: 0.3rem 0.8rem; border-bottom: 1px solid #ddd; text-align: left; }
   </style>
@@ -45,6 +46,11 @@
     </form>
     <p id="error-sesion" class="error" role="alert" hidden></p>
     <p id="sin-sesiones">Aún no hay sesiones.</p>
+    <table id="tabla-semanas" hidden>
+      <caption>Carga semanal (lunes a domingo)</caption>
+      <thead><tr><th>Semana del</th><th>Carga</th><th>Cambio</th><th>Aviso</th></tr></thead>
+      <tbody></tbody>
+    </table>
     <table id="tabla-sesiones" hidden>
       <caption>Sesiones</caption>
       <thead><tr><th>Fecha</th><th>Minutos</th><th>RPE</th><th>Carga</th><th></th></tr></thead>
