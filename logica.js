@@ -122,6 +122,11 @@ function borrarSesion(sesiones, id) {
   return sesiones.filter((s) => s.id !== id);
 }
 
+// Copia de la lista con la sesión de ese id cambiada por los datos nuevos.
+function actualizarSesion(sesiones, id, datos) {
+  return sesiones.map((s) => (s.id === id ? { ...s, ...datos } : s));
+}
+
 // Sesiones a partir del texto guardado en localStorage. [] si falta o está corrupto.
 function leerSesionesGuardadas(texto) {
   try {
@@ -194,5 +199,6 @@ if (typeof module !== 'undefined') {
     formatearTiempo, formatearRitmo, calcularZonas,
     leerSesion, cargaSesion, ordenarSesiones, borrarSesion, leerSesionesGuardadas, formatearFecha,
     lunesDeLaSemana, subeDemasiado, cargasSemanales, formatearCambio,
+    actualizarSesion,
   };
 }

@@ -5,6 +5,7 @@ const {
   formatearTiempo, formatearRitmo, calcularZonas,
   leerSesion, cargaSesion, ordenarSesiones, borrarSesion, leerSesionesGuardadas, formatearFecha,
   lunesDeLaSemana, subeDemasiado, cargasSemanales, formatearCambio,
+  actualizarSesion,
 } = require('./logica.js');
 
 test('leerDistancia acepta enteros y decimales con coma o punto', () => {
@@ -179,4 +180,22 @@ test('formatearCambio da el porcentaje con signo, o — sin semana anterior', ()
   assert.equal(formatearCambio(1000, 800), '-20 %');
   assert.equal(formatearCambio(1000, 1000), '0 %');
   assert.equal(formatearCambio(0, 500), '—');
+});
+
+test('actualizarSesion cambia solo la sesión con ese id, sin modificar la lista original', () => {
+  const lista = [
+    { id: 'a', fecha: '2026-11-09', minutos: 60, rpe: 5 },
+    { id: 'b', fecha: '2026-11-10', minutos: 30, rpe: 3 },
+  ];
+  const nueva = actualizarSesion(lista, 'a', { fecha: '2026-11-08', minutos: 90, rpe: 6 });
+  assert.deepEqual(nueva, [
+    { id: 'a', fecha: '2026-11-08', minutos: 90, rpe: 6 },
+    { id: 'b', fecha: '2026-11-10', minutos: 30, rpe: 3 },
+  ]);
+  assert.equal(lista[0].minutos, 60);
+});
+
+test('actualizarSesion con un id que no existe deja la lista igual', () => {
+  const lista = [{ id: 'a', fecha: '2026-11-09', minutos: 60, rpe: 5 }];
+  assert.deepEqual(actualizarSesion(lista, 'zzz', { fecha: '2026-11-01', minutos: 1, rpe: 1 }), lista);
 });

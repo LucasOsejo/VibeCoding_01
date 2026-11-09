@@ -58,6 +58,11 @@ const errorSesion = document.getElementById('error-sesion');
 const sinSesiones = document.getElementById('sin-sesiones');
 const tablaSesiones = document.getElementById('tabla-sesiones');
 const tablaSemanas = document.getElementById('tabla-semanas');
+const botonSesion = document.getElementById('boton-sesion');
+const cancelarEdicion = document.getElementById('cancelar-edicion');
+
+// id de la sesión que se está editando, o null si el formulario añade una nueva.
+let idEditando = null;
 
 function cargarSesiones() {
   return leerSesionesGuardadas(localStorage.getItem(CLAVE_SESIONES));
@@ -71,6 +76,35 @@ function nuevoId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
+function limpiarFormularioSesion() {
+  idEditando = null;
+  formSesion.minutos.value = '';
+  formSesion.rpe.value = '';
+  botonSesion.textContent = 'Añadir sesión';
+  cancelarEdicion.hidden = true;
+  errorSesion.hidden = true;
+}
+
+function empezarEdicion(sesion) {
+  idEditando = sesion.id;
+  formSesion.fecha.value = sesion.fecha;
+  formSesion.minutos.value = sesion.minutos;
+  formSesion.rpe.value = sesion.rpe;
+  botonSesion.textContent = 'Guardar cambios';
+  cancelarEdicion.hidden = false;
+  errorSesion.hidden = true;
+  formSesion.minutos.focus();
+}
+
+function botonDeFila(texto, accion, sesion) {
+  const boton = document.createElement('button');
+  boton.type = 'button';
+  boton.textContent = texto;
+  boton.setAttribute('aria-label', `${texto} sesión del ${formatearFecha(sesion.fecha)}`);
+  boton.addEventListener('click', accion);
+  return boton;
+}
+
 function filaSesion(sesion) {
   const tr = document.createElement('tr');
   const textos = [formatearFecha(sesion.fecha), sesion.minutos, sesion.rpe, cargaSesion(sesion)];
@@ -79,16 +113,14 @@ function filaSesion(sesion) {
     td.textContent = texto;
     tr.append(td);
   }
-  const boton = document.createElement('button');
-  boton.type = 'button';
-  boton.textContent = 'Borrar';
-  boton.setAttribute('aria-label', `Borrar sesión del ${formatearFecha(sesion.fecha)}`);
-  boton.addEventListener('click', () => {
+  const editar = botonDeFila('Editar', () => empezarEdicion(sesion), sesion);
+  const borrar = botonDeFila('Borrar', () => {
+    if (idEditando === sesion.id) limpiarFormularioSesion();
     guardarSesiones(borrarSesion(cargarSesiones(), sesion.id));
     pintarDiario();
-  });
+  }, sesion);
   const td = document.createElement('td');
-  td.append(boton);
+  td.append(editar, ' ', borrar);
   tr.append(td);
   return tr;
 }
@@ -121,11 +153,14 @@ formSesion.addEventListener('submit', (evento) => {
     errorSesion.hidden = false;
     return;
   }
-  errorSesion.hidden = true;
-  guardarSesiones([...cargarSesiones(), { id: nuevoId(), ...sesion }]);
-  formSesion.minutos.value = '';
-  formSesion.rpe.value = '';
+  const sesiones = cargarSesiones();
+  guardarSesiones(idEditando
+    ? actualizarSesion(sesiones, idEditando, sesion)
+    : [...sesiones, { id: nuevoId(), ...sesion }]);
+  limpiarFormularioSesion();
   pintarDiario();
 });
+
+cancelarEdicion.addEventListener('click', limpiarFormularioSesion);
 
 pintarDiario();

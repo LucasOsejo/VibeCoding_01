@@ -20,7 +20,7 @@ Corredores aficionados que preparan una media maratón y quieren saber a qué ri
 **Diario de carga**
 - Registrar una sesión: fecha, minutos y esfuerzo percibido (RPE, entero de 1 a 10).
 - Calcular la carga de la sesión: `minutos × RPE`.
-- Listar las sesiones guardadas y permitir borrar cada una.
+- Listar las sesiones guardadas y permitir editar o borrar cada una.
 - Mostrar la carga total de cada semana (de lunes a domingo).
 - Avisar en una semana si su carga sube **más de un 15 %** respecto a la semana anterior. Si la semana anterior no tiene sesiones (carga 0), no se avisa.
 - Guardar las sesiones en el navegador (`localStorage`) para que sigan ahí al recargar.
@@ -29,7 +29,6 @@ Corredores aficionados que preparan una media maratón y quieren saber a qué ri
 ## Fuera de alcance
 - Servidor, base de datos, cuentas de usuario o sincronizar entre dispositivos.
 - Librerías o frameworks externos en la app.
-- Editar sesiones (se borra y se vuelve a crear).
 - Gráficas, planes de entrenamiento, zonas por frecuencia cardiaca o ritmos de otras fórmulas (Daniels, VDOT…).
 - Unidades en millas o en otros idiomas: todo en km y en español.
 - Exportar o importar datos.

@@ -24,7 +24,7 @@ test('añadir, recargar y borrar una sesión', async ({ page }) => {
 
   const filas = page.locator('#tabla-sesiones tbody tr');
   await expect(filas).toHaveCount(1);
-  await expect(filas.first().locator('td')).toHaveText(['09/11/2026', '60', '5', '300', 'Borrar']);
+  await expect(filas.first().locator('td')).toHaveText(['09/11/2026', '60', '5', '300', 'Editar Borrar']);
 
   await page.reload();
   await expect(filas).toHaveCount(1);
@@ -61,4 +61,72 @@ test('sin fecha muestra un error', async ({ page }) => {
   await page.getByLabel('Esfuerzo (RPE 1–10)').fill('5');
   await page.getByRole('button', { name: 'Añadir sesión' }).click();
   await expect(page.locator('#error-sesion')).toHaveText('Elige la fecha de la sesión.');
+});
+
+test('editar una sesión recalcula su carga y la semanal, y sobrevive a una recarga', async ({ page }) => {
+  await anadirSesion(page, '2026-11-09', '60', '5');
+  await page.getByRole('button', { name: 'Editar sesión del 09/11/2026' }).click();
+
+  await expect(page.getByLabel('Fecha')).toHaveValue('2026-11-09');
+  await expect(page.getByLabel('Minutos')).toHaveValue('60');
+  await expect(page.getByLabel('Esfuerzo (RPE 1–10)')).toHaveValue('5');
+  await expect(page.getByRole('button', { name: 'Cancelar' })).toBeVisible();
+
+  await page.getByLabel('Minutos').fill('90');
+  await page.getByRole('button', { name: 'Guardar cambios' }).click();
+
+  const filas = page.locator('#tabla-sesiones tbody tr');
+  await expect(filas).toHaveCount(1);
+  await expect(filas.first().locator('td').nth(3)).toHaveText('450');
+  await expect(page.locator('#tabla-semanas tbody tr').first().locator('td').nth(1)).toHaveText('450');
+  await expect(page.getByRole('button', { name: 'Añadir sesión' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cancelar' })).toBeHidden();
+
+  await page.reload();
+  await expect(filas.first().locator('td').nth(3)).toHaveText('450');
+});
+
+test('cambiar la fecha al editar mueve la sesión de semana', async ({ page }) => {
+  await anadirSesion(page, '2026-11-09', '60', '5');
+  await page.getByRole('button', { name: 'Editar sesión del 09/11/2026' }).click();
+  await page.getByLabel('Fecha').fill('2026-11-08');
+  await page.getByRole('button', { name: 'Guardar cambios' }).click();
+
+  await expect(page.locator('#tabla-sesiones tbody tr td:first-child')).toHaveText(['08/11/2026']);
+  await expect(page.locator('#tabla-semanas tbody tr td:first-child')).toHaveText(['02/11/2026']);
+});
+
+test('cancelar la edición no cambia nada y la siguiente sesión se añade nueva', async ({ page }) => {
+  await anadirSesion(page, '2026-11-09', '60', '5');
+  await page.getByRole('button', { name: 'Editar sesión del 09/11/2026' }).click();
+  await page.getByLabel('Minutos').fill('999');
+  await page.getByRole('button', { name: 'Cancelar' }).click();
+
+  const filas = page.locator('#tabla-sesiones tbody tr');
+  await expect(filas.first().locator('td').nth(1)).toHaveText('60');
+  await expect(page.getByLabel('Minutos')).toHaveValue('');
+
+  await anadirSesion(page, '2026-11-10', '30', '3');
+  await expect(filas).toHaveCount(2);
+});
+
+test('un RPE de 11 al editar muestra un error y la sesión no cambia', async ({ page }) => {
+  await anadirSesion(page, '2026-11-09', '60', '5');
+  await page.getByRole('button', { name: 'Editar sesión del 09/11/2026' }).click();
+  await page.getByLabel('Esfuerzo (RPE 1–10)').fill('11');
+  await page.getByRole('button', { name: 'Guardar cambios' }).click();
+
+  await expect(page.locator('#error-sesion')).toHaveText('El RPE tiene que ser un número entero de 1 a 10.');
+  await expect(page.locator('#tabla-sesiones tbody tr').first().locator('td').nth(2)).toHaveText('5');
+  await expect(page.getByRole('button', { name: 'Guardar cambios' })).toBeVisible();
+});
+
+test('borrar la sesión que se está editando vuelve al modo añadir', async ({ page }) => {
+  await anadirSesion(page, '2026-11-09', '60', '5');
+  await page.getByRole('button', { name: 'Editar sesión del 09/11/2026' }).click();
+  await page.getByRole('button', { name: 'Borrar sesión del 09/11/2026' }).click();
+
+  await expect(page.getByRole('button', { name: 'Añadir sesión' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cancelar' })).toBeHidden();
+  await expect(page.getByText('Aún no hay sesiones.')).toBeVisible();
 });

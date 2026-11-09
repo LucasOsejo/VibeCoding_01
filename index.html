@@ -42,7 +42,8 @@
       <label>Fecha <input id="fecha" name="fecha" type="date"></label>
       <label>Minutos <input id="minutos" name="minutos" inputmode="numeric" placeholder="60"></label>
       <label>Esfuerzo (RPE 1–10) <input id="rpe" name="rpe" inputmode="numeric" placeholder="5"></label>
-      <button type="submit">Añadir sesión</button>
+      <button type="submit" id="boton-sesion">Añadir sesión</button>
+      <button type="button" id="cancelar-edicion" hidden>Cancelar</button>
     </form>
     <p id="error-sesion" class="error" role="alert" hidden></p>
     <p id="sin-sesiones">Aún no hay sesiones.</p>

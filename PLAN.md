@@ -77,3 +77,18 @@ Al cerrar cada fase: la app se abre con doble clic en `index.html`, `node --test
 - e2e: sesiones que suman 1000 y 1160 en semanas seguidas → se ve el aviso; al borrar una hasta 1150 → desaparece.
 
 **Hecho cuando:** el aviso aparece y desaparece según esos casos y las pruebas pasan.
+
+## Fase 6 · Editar sesiones
+
+**Objetivo:** corregir una sesión sin tener que borrarla y crearla de nuevo.
+
+**Tareas:**
+- [x] En `logica.js`: `actualizarSesion(sesiones, id, datos)` cambia fecha, minutos y RPE de una sesión sin tocar las demás.
+- [x] Botón «Editar» en cada sesión: rellena el formulario con sus datos, el botón pasa a «Guardar cambios» y aparece «Cancelar».
+- [x] Al guardar se validan los datos igual que al añadir y se actualizan la lista, la carga semanal y `localStorage`.
+
+**Pruebas:**
+- Unitarias de `actualizarSesion`.
+- e2e: editar 60 min → 90 min con RPE 5 → carga 450, la semana también, y sigue tras recargar; «Cancelar» no cambia nada; RPE 11 al editar → error y la sesión no cambia.
+
+**Hecho cuando:** se puede editar una sesión, los totales se recalculan, el cambio sobrevive a una recarga y las pruebas pasan.
