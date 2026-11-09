@@ -53,10 +53,10 @@ Al cerrar cada fase: la app se abre con doble clic en `index.html`, `node --test
 **Objetivo:** apuntar sesiones que no se pierden al recargar.
 
 **Tareas:**
-- [ ] Formulario de sesión: fecha, minutos y RPE (1–10), con validación.
-- [ ] En `logica.js`: carga = minutos × RPE y validación de la sesión.
-- [ ] Lista de sesiones por fecha, con su carga y un botón para borrar cada una.
-- [ ] Guardar y leer las sesiones en `localStorage`.
+- [x] Formulario de sesión: fecha, minutos y RPE (1–10), con validación.
+- [x] En `logica.js`: carga = minutos × RPE y validación de la sesión.
+- [x] Lista de sesiones por fecha, con su carga y un botón para borrar cada una.
+- [x] Guardar y leer las sesiones en `localStorage`.
 
 **Pruebas:**
 - Unitarias de la carga y la validación.

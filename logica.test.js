@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const {
   leerDistancia, leerTiempo, predecirSegundos, calcularPredicciones,
   formatearTiempo, formatearRitmo, calcularZonas,
+  leerSesion, cargaSesion, ordenarSesiones, borrarSesion, leerSesionesGuardadas, formatearFecha,
 } = require('./logica.js');
 
 test('leerDistancia acepta enteros y decimales con coma o punto', () => {
@@ -70,4 +71,57 @@ test('calcularZonas: el rodaje siempre es 30 s/km más ancho y más lento que el
   const z = calcularZonas(6619, 21.0975);
   assert.equal(Math.round(z.rodajeHasta - z.rodajeDesde), 30);
   assert.ok(z.series < z.tempo && z.tempo < z.rodajeDesde);
+});
+
+test('leerSesion devuelve la sesión si los datos son válidos', () => {
+  assert.deepEqual(leerSesion('2026-11-09', '60', '5'), {
+    sesion: { fecha: '2026-11-09', minutos: 60, rpe: 5 },
+  });
+  assert.deepEqual(leerSesion('2026-11-09', ' 45 ', '10').sesion.rpe, 10);
+});
+
+test('leerSesion rechaza fecha vacía o inexistente', () => {
+  for (const f of ['', '2026-02-30', '09/11/2026', 'hoy']) {
+    assert.equal(leerSesion(f, '60', '5').error, 'Elige la fecha de la sesión.', `«${f}»`);
+  }
+});
+
+test('leerSesion rechaza minutos que no son un entero mayor que 0', () => {
+  for (const m of ['', '0', '-10', '30.5', 'abc']) {
+    assert.equal(leerSesion('2026-11-09', m, '5').error, 'Escribe los minutos, un número entero mayor que 0.', `«${m}»`);
+  }
+});
+
+test('leerSesion rechaza RPE fuera de 1–10 o no entero', () => {
+  for (const r of ['', '0', '11', '5.5', 'x']) {
+    assert.equal(leerSesion('2026-11-09', '60', r).error, 'El RPE tiene que ser un número entero de 1 a 10.', `«${r}»`);
+  }
+});
+
+test('cargaSesion = minutos × RPE', () => {
+  assert.equal(cargaSesion({ minutos: 60, rpe: 5 }), 300);
+});
+
+test('ordenarSesiones pone la más reciente primero sin modificar la lista original', () => {
+  const lista = [{ fecha: '2026-11-02' }, { fecha: '2026-11-09' }, { fecha: '2026-10-30' }];
+  assert.deepEqual(ordenarSesiones(lista).map((x) => x.fecha), ['2026-11-09', '2026-11-02', '2026-10-30']);
+  assert.equal(lista[0].fecha, '2026-11-02');
+});
+
+test('borrarSesion quita solo la sesión con ese id', () => {
+  const lista = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  assert.deepEqual(borrarSesion(lista, 'b'), [{ id: 'a' }, { id: 'c' }]);
+  assert.equal(lista.length, 3);
+});
+
+test('leerSesionesGuardadas devuelve [] si no hay nada o está corrupto', () => {
+  assert.deepEqual(leerSesionesGuardadas(null), []);
+  assert.deepEqual(leerSesionesGuardadas('no es json'), []);
+  assert.deepEqual(leerSesionesGuardadas('{"a":1}'), []);
+  assert.deepEqual(leerSesionesGuardadas('[{"id":"a","fecha":"2026-11-09","minutos":60,"rpe":5}]'),
+    [{ id: 'a', fecha: '2026-11-09', minutos: 60, rpe: 5 }]);
+});
+
+test('formatearFecha pasa de aaaa-mm-dd a dd/mm/aaaa', () => {
+  assert.equal(formatearFecha('2026-11-09'), '09/11/2026');
 });

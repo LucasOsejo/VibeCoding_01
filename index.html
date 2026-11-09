@@ -37,6 +37,19 @@
 
   <section id="diario">
     <h2>Diario de carga</h2>
+    <form id="form-sesion" novalidate>
+      <label>Fecha <input id="fecha" name="fecha" type="date"></label>
+      <label>Minutos <input id="minutos" name="minutos" inputmode="numeric" placeholder="60"></label>
+      <label>Esfuerzo (RPE 1–10) <input id="rpe" name="rpe" inputmode="numeric" placeholder="5"></label>
+      <button type="submit">Añadir sesión</button>
+    </form>
+    <p id="error-sesion" class="error" role="alert" hidden></p>
+    <p id="sin-sesiones">Aún no hay sesiones.</p>
+    <table id="tabla-sesiones" hidden>
+      <caption>Sesiones</caption>
+      <thead><tr><th>Fecha</th><th>Minutos</th><th>RPE</th><th>Carga</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
   </section>
 
   <script src="logica.js"></script>

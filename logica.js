@@ -78,9 +78,70 @@ function formatearRitmo(segundosPorKm) {
   return `${Math.floor(total / 60)}:${dosCifras(total % 60)}/km`;
 }
 
+// ---------- Diario de carga ----------
+
+// true si el texto es una fecha real en formato aaaa-mm-dd.
+function esFechaValida(texto) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(texto)) return false;
+  const [a, m, d] = texto.split('-').map(Number);
+  const fecha = new Date(Date.UTC(a, m - 1, d));
+  return fecha.getUTCFullYear() === a && fecha.getUTCMonth() === m - 1 && fecha.getUTCDate() === d;
+}
+
+// Entero a partir de un texto como "60". null si no es un entero.
+function leerEntero(texto) {
+  const limpio = String(texto).trim();
+  return /^-?\d+$/.test(limpio) ? Number(limpio) : null;
+}
+
+// { sesion } si los datos son válidos, { error } con el motivo si no.
+function leerSesion(fechaTexto, minutosTexto, rpeTexto) {
+  const fecha = String(fechaTexto).trim();
+  if (!esFechaValida(fecha)) return { error: 'Elige la fecha de la sesión.' };
+  const minutos = leerEntero(minutosTexto);
+  if (minutos === null || minutos <= 0) {
+    return { error: 'Escribe los minutos, un número entero mayor que 0.' };
+  }
+  const rpe = leerEntero(rpeTexto);
+  if (rpe === null || rpe < 1 || rpe > 10) {
+    return { error: 'El RPE tiene que ser un número entero de 1 a 10.' };
+  }
+  return { sesion: { fecha, minutos, rpe } };
+}
+
+function cargaSesion(sesion) {
+  return sesion.minutos * sesion.rpe;
+}
+
+// Copia ordenada de la más reciente a la más antigua.
+function ordenarSesiones(sesiones) {
+  return [...sesiones].sort((a, b) => b.fecha.localeCompare(a.fecha));
+}
+
+function borrarSesion(sesiones, id) {
+  return sesiones.filter((s) => s.id !== id);
+}
+
+// Sesiones a partir del texto guardado en localStorage. [] si falta o está corrupto.
+function leerSesionesGuardadas(texto) {
+  try {
+    const datos = JSON.parse(texto);
+    return Array.isArray(datos) ? datos : [];
+  } catch {
+    return [];
+  }
+}
+
+// "aaaa-mm-dd" → "dd/mm/aaaa".
+function formatearFecha(fecha) {
+  const [a, m, d] = fecha.split('-');
+  return `${d}/${m}/${a}`;
+}
+
 if (typeof module !== 'undefined') {
   module.exports = {
     leerDistancia, leerTiempo, predecirSegundos, calcularPredicciones,
     formatearTiempo, formatearRitmo, calcularZonas,
+    leerSesion, cargaSesion, ordenarSesiones, borrarSesion, leerSesionesGuardadas, formatearFecha,
   };
 }
