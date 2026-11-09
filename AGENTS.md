@@ -3,6 +3,7 @@
 ## Antes de empezar
 - Lee `docs/project-info.md` (qué es la app) y `PLAN.md` (qué falta por hacer). Si no existen, pídemelos.
 - Una fase de `PLAN.md` cada vez. Planifica antes de tocar código y espera a que apruebe el plan.
+- La Fase 1 nunca incluye base de datos ni guardar datos: eso va en una fase posterior.
 - Si algo no está claro o hay dos opciones razonables, pregunta antes de asumir.
 
 ## Convenciones
