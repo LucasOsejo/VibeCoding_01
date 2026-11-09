@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   leerDistancia, leerTiempo, predecirSegundos, calcularPredicciones,
-  formatearTiempo, formatearRitmo,
+  formatearTiempo, formatearRitmo, calcularZonas,
 } = require('./logica.js');
 
 test('leerDistancia acepta enteros y decimales con coma o punto', () => {
@@ -56,4 +56,18 @@ test('formatearTiempo usa mm:ss bajo la hora y h:mm:ss desde la hora', () => {
 test('formatearRitmo redondea sin producir :60', () => {
   assert.equal(formatearRitmo(287.8), '4:48/km');
   assert.equal(formatearRitmo(299.6), '5:00/km');
+});
+
+test('calcularZonas: series = ritmo 5K, tempo = ritmo media, rodaje = maratón +45 a +75 s/km', () => {
+  const z = calcularZonas(3000, 10);
+  assert.equal(formatearRitmo(z.series), '4:48/km');
+  assert.equal(formatearRitmo(z.tempo), '5:14/km');
+  assert.equal(formatearRitmo(z.rodajeDesde), '6:12/km');
+  assert.equal(formatearRitmo(z.rodajeHasta), '6:42/km');
+});
+
+test('calcularZonas: el rodaje siempre es 30 s/km más ancho y más lento que el tempo', () => {
+  const z = calcularZonas(6619, 21.0975);
+  assert.equal(Math.round(z.rodajeHasta - z.rodajeDesde), 30);
+  assert.ok(z.series < z.tempo && z.tempo < z.rodajeDesde);
 });

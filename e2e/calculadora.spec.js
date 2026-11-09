@@ -29,6 +29,7 @@ test('distancia 0 muestra un error y ninguna tabla', async ({ page }) => {
   await calcular(page, '0', '50:00');
   await expect(page.getByRole('alert')).toHaveText('Escribe la distancia en km, mayor que 0.');
   await expect(page.locator('#tabla-predicciones')).toBeHidden();
+  await expect(page.locator('#tabla-zonas')).toBeHidden();
 });
 
 test('un tiempo mal escrito muestra un error y oculta la tabla anterior', async ({ page }) => {
@@ -43,4 +44,14 @@ test('Intro en el formulario también calcula', async ({ page }) => {
   await page.getByLabel('Tiempo').fill('1:50:19');
   await page.getByLabel('Tiempo').press('Enter');
   await expect(page.locator('#tabla-predicciones tbody tr').nth(2).locator('td')).toHaveText(['Media maratón', '1:50:19', '5:14/km']);
+});
+
+test('10 km en 50:00 muestra los ritmos de series, tempo y rodaje', async ({ page }) => {
+  await calcular(page, '10', '50:00');
+
+  const filas = page.locator('#tabla-zonas tbody tr');
+  await expect(filas).toHaveCount(3);
+  await expect(filas.nth(0).locator('td')).toHaveText(['Series', '4:48/km']);
+  await expect(filas.nth(1).locator('td')).toHaveText(['Tempo', '5:14/km']);
+  await expect(filas.nth(2).locator('td')).toHaveText(['Rodaje', '6:12–6:42/km']);
 });

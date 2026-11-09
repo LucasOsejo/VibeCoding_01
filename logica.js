@@ -43,6 +43,22 @@ function calcularPredicciones(segundos, km) {
   });
 }
 
+// Rodaje = ritmo de maratón más este margen (s/km).
+const RODAJE_MARGEN_DESDE = 45;
+const RODAJE_MARGEN_HASTA = 75;
+
+// Ritmos de entrenamiento (s/km) sacados de las predicciones de Riegel.
+function calcularZonas(segundos, km) {
+  const ritmo = (kmObjetivo) => predecirSegundos(segundos, km, kmObjetivo) / kmObjetivo;
+  const maraton = ritmo(42.195);
+  return {
+    series: ritmo(5),
+    tempo: ritmo(21.0975),
+    rodajeDesde: maraton + RODAJE_MARGEN_DESDE,
+    rodajeHasta: maraton + RODAJE_MARGEN_HASTA,
+  };
+}
+
 function dosCifras(n) {
   return String(n).padStart(2, '0');
 }
@@ -65,6 +81,6 @@ function formatearRitmo(segundosPorKm) {
 if (typeof module !== 'undefined') {
   module.exports = {
     leerDistancia, leerTiempo, predecirSegundos, calcularPredicciones,
-    formatearTiempo, formatearRitmo,
+    formatearTiempo, formatearRitmo, calcularZonas,
   };
 }

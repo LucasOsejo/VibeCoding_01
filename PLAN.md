@@ -39,8 +39,8 @@ Al cerrar cada fase: la app se abre con doble clic en `index.html`, `node --test
 **Objetivo:** mostrar los ritmos de entrenamiento debajo de las predicciones.
 
 **Tareas:**
-- [ ] En `logica.js`: series = ritmo de 5K; tempo = ritmo de media; rodaje = ritmo de maratón + 45 a + 75 s/km.
-- [ ] Mostrar las tres zonas en la página.
+- [x] En `logica.js`: series = ritmo de 5K; tempo = ritmo de media; rodaje = ritmo de maratón + 45 a + 75 s/km.
+- [x] Mostrar las tres zonas en la página.
 
 **Pruebas:**
 - Unitarias de las zonas.
