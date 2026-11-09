@@ -23,10 +23,10 @@ Al cerrar cada fase: la app se abre con doble clic en `index.html`, `node --test
 **Objetivo:** meter una marca reciente y ver las predicciones de 5K, 10K, media y maratón.
 
 **Tareas:**
-- [ ] Formulario de marca: distancia (km) y tiempo (`hh:mm:ss`).
-- [ ] En `logica.js`: leer el tiempo, aplicar Riegel (exponente 1,06), calcular el ritmo y formatear tiempos y ritmos.
-- [ ] Tabla con tiempo y ritmo (min/km) de cada distancia.
-- [ ] Mensajes de error si falta un dato o no es válido.
+- [x] Formulario de marca: distancia (km) y tiempo (`hh:mm:ss`).
+- [x] En `logica.js`: leer el tiempo, aplicar Riegel (exponente 1,06), calcular el ritmo y formatear tiempos y ritmos.
+- [x] Tabla con tiempo y ritmo (min/km) de cada distancia.
+- [x] Mensajes de error si falta un dato o no es válido.
 
 **Pruebas:**
 - Unitarias de cada función de `logica.js`.

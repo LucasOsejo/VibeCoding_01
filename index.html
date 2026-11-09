@@ -4,12 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tempo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
+    label { display: block; margin: 0.5rem 0; }
+    .error { color: #b00020; }
+    table { border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.3rem 0.8rem; border-bottom: 1px solid #ddd; text-align: left; }
+  </style>
 </head>
 <body>
   <h1>Tempo</h1>
 
   <section id="calculadora">
     <h2>Calculadora</h2>
+    <form id="form-marca" novalidate>
+      <label>Distancia (km) <input id="distancia" name="distancia" inputmode="decimal" placeholder="10"></label>
+      <label>Tiempo <input id="tiempo" name="tiempo" placeholder="50:00 o 1:50:19"></label>
+      <button type="submit">Calcular</button>
+    </form>
+    <p id="error-marca" class="error" role="alert" hidden></p>
+    <table id="tabla-predicciones" hidden>
+      <caption>Predicciones (Riegel)</caption>
+      <thead><tr><th>Distancia</th><th>Tiempo</th><th>Ritmo</th></tr></thead>
+      <tbody></tbody>
+    </table>
   </section>
 
   <section id="diario">
