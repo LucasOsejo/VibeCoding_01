@@ -44,7 +44,7 @@ Corredores aficionados que preparan una media maratón y quieren saber a qué ri
 
 ## Datos y claves
 - Datos: la marca que escribe el usuario (no se guarda) y sus sesiones (fecha, minutos, RPE), guardadas solo en el `localStorage` de su navegador.
-- No necesita claves. `GEMINI_API_KEY` de `.env.example` viene de la plantilla y no se usa.
+- No necesita claves: `.env.example` queda sin ninguna.
 
 ## Cómo se prueba
 - **Pruebas de la lógica** junto al código (`logica.test.js`), con `node --test`, que viene con Node y no instala nada.
